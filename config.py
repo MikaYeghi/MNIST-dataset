@@ -15,3 +15,7 @@ SCHEDULER_STEP = 5
 SCHEDULER_GAMMA = 0.5
 LOAD_MODEL = False
 VAL_FREQ = 5
+
+"""Test parameters"""
+TEST_DATASET = True
+PREDS_PATH = os.path.join(ROOT_PATH, "predictions/submission.csv")
