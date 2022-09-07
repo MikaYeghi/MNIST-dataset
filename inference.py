@@ -45,10 +45,6 @@ total = len(test_data)
 if TEST_DATASET:    # data set without known labels
     pred_labels = torch.empty((0)).long().to(device)
     for images_batch in tqdm(test_loader):
-        from matplotlib import pyplot as plt
-        # for image in images_batch:
-        #     plt.imshow(image.cpu().numpy())
-        #     plt.show()
         images_batch = torch.unsqueeze(images_batch, 1)
         images_batch = preprocess_batch(images_batch)
 
@@ -56,9 +52,12 @@ if TEST_DATASET:    # data set without known labels
         pred_labels_ = torch.argmax(preds, dim=1).long()
         pred_labels = torch.cat((pred_labels, pred_labels_))
     # Convert pred_labels to a Pandas Dataframe
-    pred_labels = pd.DataFrame(pred_labels.cpu().numpy())
+    pred_labels = pd.DataFrame(pred_labels.cpu().numpy(), columns=['Label'])
+    pred_labels.index.names = ['ImageId']
+    pred_labels.reset_index(inplace=True)
+    pred_labels['ImageId'] += 1
     print(f"Saving predictions to {PREDS_PATH}...")
-    pred_labels.to_csv(PREDS_PATH, index=True)
+    pred_labels.to_csv(PREDS_PATH, index=False)
     print("Predictions successfully saved!")
 else:               # data set with known labels
     for images_batch, labels_batch in tqdm(test_loader):
