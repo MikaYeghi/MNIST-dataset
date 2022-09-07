@@ -1,9 +1,11 @@
 import torch
 from torch import nn
+import os
+
 import pdb
 
 class MNISTEfficientNet(nn.Module):
-    def __init__(self, device='cuda') -> None:
+    def __init__(self, device='cuda', save_path='saved_models/') -> None:
         super().__init__()
 
         self.backbone = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True)
@@ -19,3 +21,17 @@ class MNISTEfficientNet(nn.Module):
     
     def to(self, device):
         self.backbone.to(device)
+
+    def save(self):
+        """Saves the model to a file."""
+        print("Saving the model...")
+        path = os.path.join(self.save_path, "model.pt")
+        torch.save(self.backbone.state_dict(), path)
+    
+    def load(self, path):
+        """Loads the model from a file."""
+        try:
+            self.backbone.load_state_dict(torch.load(path))
+            print(f"Model {path} loaded successfully.")
+        except Exception as e:
+            print(e)

@@ -17,6 +17,9 @@ BATCH_SIZE = config.BATCH_SIZE
 LR = config.LR
 N_EPOCHS = config.N_EPOCHS
 NUM_CLASSES = config.NUM_CLASSES
+LOAD_MODEL = config.LOAD_MODEL
+SAVE_PATH = config.SAVE_PATH
+MODEL_NAME = config.MODEL_NAME
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 """Load the data set"""
@@ -31,6 +34,9 @@ test_loader = DataLoader(test_data, batch_size=BATCH_SIZE)
 
 """Initialize the model"""
 model = MNISTEfficientNet(device=device)
+if LOAD_MODEL:
+    model_path = os.path.join(SAVE_PATH, MODEL_NAME)
+    model.load(model_path)
 
 """Define the loss function and the optimizer"""
 loss_fn = create_loss_fn()
@@ -49,6 +55,8 @@ for epoch in range(N_EPOCHS):
 
         loss = train_step(images_batch, labels_batch)
         train_losses.append(loss)
+
+        model.save()
 
         print(f"Epoch: #{epoch + 1}. Loss: {round(loss, 5)}. LR: {optimizer.state_dict()['param_groups'][0]['lr']}.")
         print("-" * 80)
