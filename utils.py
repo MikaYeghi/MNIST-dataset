@@ -44,18 +44,24 @@ def preprocess_batch(images):
 def OH_encode(labels, NUM_CLASSES):
     return torch.nn.functional.one_hot(labels % NUM_CLASSES).float()
 
-def plot_training_info(train_losses, LRs):
+def plot_training_info(train_losses, val_losses, LRs):
     plt.figure()
-    plt.subplot(211)
+    plt.subplot(311)
     plt.plot(train_losses, 'b')
     plt.grid(True)
     plt.xlabel("Iteration number")
     plt.ylabel("Cross Entropy Loss")
     plt.title("Training loss")
-    plt.subplot(212)
+    plt.subplot(312)
     plt.plot(LRs, 'b')
     plt.grid(True)
     plt.xlabel("Iteration number")
     plt.ylabel("Learning rate value")
     plt.title("Learning rate")
+    plt.subplot(313)
+    plt.plot(val_losses, 'b')
+    plt.grid(True)
+    plt.xlabel("Iteration number")
+    plt.ylabel("Cross Entropy Loss")
+    plt.title("Validation loss")
     plt.show()

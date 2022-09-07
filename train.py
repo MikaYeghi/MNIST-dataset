@@ -14,6 +14,7 @@ import pdb
 ROOT_PATH = config.ROOT_PATH
 DATA_PATH = config.DATA_PATH
 BATCH_SIZE = config.BATCH_SIZE
+VAL_FREQ = config.VAL_FREQ
 LR = config.LR
 N_EPOCHS = config.N_EPOCHS
 NUM_CLASSES = config.NUM_CLASSES
@@ -26,10 +27,13 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 """Load the data set"""
 train_path = os.path.join(DATA_PATH, "train.csv")
-train_data = MNISTDataset(train_path, device)
+val_path = os.path.join(DATA_PATH, "val.csv")
+train_data = MNISTDataset(train_path, device=device)
+val_data = MNISTDataset(val_path, device=device)
 
 """Create the dataloaders"""
 train_loader = DataLoader(train_data, batch_size=BATCH_SIZE)
+val_loader = DataLoader(val_data, batch_size=BATCH_SIZE)
 
 """Initialize the model"""
 model = MNISTEfficientNet(device=device)
@@ -45,8 +49,8 @@ scheduler = create_scheduler(optimizer, SCHEDULER_GAMMA)
 """Training"""
 train_step = make_train_step(model, loss_fn, optimizer)
 train_losses = list()
+val_losses = list()
 LRs = list()
-print("-" * 80)
 
 for epoch in range(N_EPOCHS):
     t = tqdm(train_loader, desc=f"Epoch #{epoch + 1}")
@@ -61,10 +65,25 @@ for epoch in range(N_EPOCHS):
         LRs.append(optimizer.state_dict()['param_groups'][0]['lr'])
 
         t.set_description(f"Epoch: #{epoch + 1}. Loss: {round(loss, 4)}. LR: {optimizer.state_dict()['param_groups'][0]['lr']}")
-    
+
+    if (epoch + 1) % VAL_FREQ == 0:
+        print("Running validation...")
+        with torch.no_grad():
+            t = tqdm(val_loader)
+            for images_batch, labels_batch in t:
+                images_batch = torch.unsqueeze(images_batch, 1)
+                images_batch = preprocess_batch(images_batch)
+                labels_batch = OH_encode(labels_batch, NUM_CLASSES).to(device)
+
+                model.eval()
+                preds = model(images_batch)
+                val_loss = loss_fn(preds, labels_batch)
+                val_losses.append(val_loss.item())
+                t.set_description(f"Epoch: #{epoch + 1}. Validation loss: {round(val_loss.item(), 4)}.")
+
     if (epoch + 1) % SCHEDULER_STEP == 0 and epoch != 0:
         scheduler.step()
     
     model.save(MODEL_NAME)
 
-plot_training_info(train_losses, LRs)
+plot_training_info(train_losses, val_losses, LRs)
