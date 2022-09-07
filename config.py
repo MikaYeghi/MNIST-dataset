@@ -8,7 +8,7 @@ SAVE_PATH = "saved_models/"
 MODEL_NAME = "model.pt"
 
 """Train parameters"""
-N_EPOCHS = 50
+N_EPOCHS = 30
 BATCH_SIZE = 1024
 LR = 0.001
 SCHEDULER_STEP = 5

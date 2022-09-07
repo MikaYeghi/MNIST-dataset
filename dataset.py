@@ -12,6 +12,7 @@ class MNISTDataset(Dataset):
         self.device = device
 
         self.data = self.extract_data(self.data_path)
+        print(f"Loaded a data set with {self.__len__()} images.")
 
     def extract_data(self, data_path):
         return pd.read_csv(data_path)
