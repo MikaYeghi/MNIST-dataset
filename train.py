@@ -6,7 +6,7 @@ from tqdm import tqdm
 import config
 from dataset import MNISTDataset
 from model import MNISTEfficientNet
-from utils import create_loss_fn, create_optimizer, make_train_step, preprocess_batch, OH_encode
+from utils import create_loss_fn, create_optimizer, create_scheduler, make_train_step, preprocess_batch, OH_encode, plot_training_info
 
 import pdb
 
@@ -20,17 +20,16 @@ NUM_CLASSES = config.NUM_CLASSES
 LOAD_MODEL = config.LOAD_MODEL
 SAVE_PATH = config.SAVE_PATH
 MODEL_NAME = config.MODEL_NAME
+SCHEDULER_STEP = config.SCHEDULER_STEP
+SCHEDULER_GAMMA = config.SCHEDULER_GAMMA
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 """Load the data set"""
 train_path = os.path.join(DATA_PATH, "train.csv")
-test_path = os.path.join(DATA_PATH, "test.csv")
 train_data = MNISTDataset(train_path, device)
-test_data = MNISTDataset(test_path, device)
 
 """Create the dataloaders"""
 train_loader = DataLoader(train_data, batch_size=BATCH_SIZE)
-test_loader = DataLoader(test_data, batch_size=BATCH_SIZE)
 
 """Initialize the model"""
 model = MNISTEfficientNet(device=device)
@@ -41,22 +40,31 @@ if LOAD_MODEL:
 """Define the loss function and the optimizer"""
 loss_fn = create_loss_fn()
 optimizer = create_optimizer(model, LR)
+scheduler = create_scheduler(optimizer, SCHEDULER_GAMMA)
 
 """Training"""
 train_step = make_train_step(model, loss_fn, optimizer)
 train_losses = list()
+LRs = list()
 print("-" * 80)
 
 for epoch in range(N_EPOCHS):
-    for images_batch, labels_batch in tqdm(train_loader, desc=f"Epoch #{epoch + 1}"):
+    t = tqdm(train_loader, desc=f"Epoch #{epoch + 1}")
+    for images_batch, labels_batch in t:
         images_batch = torch.unsqueeze(images_batch, 1)
         images_batch = preprocess_batch(images_batch)
         labels_batch = OH_encode(labels_batch, NUM_CLASSES).to(device)
 
         loss = train_step(images_batch, labels_batch)
+        
         train_losses.append(loss)
+        LRs.append(optimizer.state_dict()['param_groups'][0]['lr'])
 
-        model.save()
+        t.set_description(f"Epoch: #{epoch + 1}. Loss: {round(loss, 4)}. LR: {optimizer.state_dict()['param_groups'][0]['lr']}")
+    
+    if (epoch + 1) % SCHEDULER_STEP == 0 and epoch != 0:
+        scheduler.step()
+    
+    model.save(MODEL_NAME)
 
-        print(f"Epoch: #{epoch + 1}. Loss: {round(loss, 5)}. LR: {optimizer.state_dict()['param_groups'][0]['lr']}.")
-        print("-" * 80)
+plot_training_info(train_losses, LRs)
