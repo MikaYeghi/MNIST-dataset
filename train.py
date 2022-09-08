@@ -2,6 +2,7 @@ import os
 import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import argparse
 
 import config
 from dataset import MNISTDataset
@@ -10,7 +11,7 @@ from utils import create_loss_fn, create_optimizer, create_scheduler, make_train
 
 import pdb
 
-"""Configurations"""
+"""CONFIG"""
 ROOT_PATH = config.ROOT_PATH
 DATA_PATH = config.DATA_PATH
 BATCH_SIZE = config.BATCH_SIZE
@@ -23,7 +24,14 @@ SAVE_PATH = config.SAVE_PATH
 MODEL_NAME = config.MODEL_NAME
 SCHEDULER_STEP = config.SCHEDULER_STEP
 SCHEDULER_GAMMA = config.SCHEDULER_GAMMA
+PLOT_RESULTS = config.PLOT_RESULTS
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+"""Argument parsing (can replace arguments from config.py)"""
+parser = argparse.ArgumentParser(description="MNIST model arguments")
+parser.add_argument('--MODEL_NAME', type=str, default=MODEL_NAME, help='model name')
+args = parser.parse_args()
+MODEL_NAME = args.MODEL_NAME
 
 """Load the data set"""
 train_path = os.path.join(DATA_PATH, "train.csv")
@@ -86,4 +94,5 @@ for epoch in range(N_EPOCHS):
     
     model.save(MODEL_NAME)
 
-plot_training_info(train_losses, val_losses, LRs)
+if PLOT_RESULTS:
+    plot_training_info(train_losses, val_losses, LRs)

@@ -7,14 +7,18 @@ NUM_CLASSES = 10
 SAVE_PATH = "saved_models/"
 MODEL_NAME = "model.pt"
 
+"""Ensemble training parameters"""
+N_MODELS = 3            # number of models in the ensemble
+
 """Train parameters"""
-N_EPOCHS = 30
+N_EPOCHS = 1
 BATCH_SIZE = 1024
 LR = 0.001
 SCHEDULER_STEP = 5
 SCHEDULER_GAMMA = 0.5
 LOAD_MODEL = False
 VAL_FREQ = 5
+PLOT_RESULTS = False
 
 """Test parameters"""
 TEST_DATASET = True

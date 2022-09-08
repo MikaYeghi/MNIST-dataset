@@ -27,8 +27,8 @@ class MNISTEfficientNet(nn.Module):
 
     def save(self, MODEL_NAME):
         """Saves the model to a file."""
-        print("Saving the model...")
         path = os.path.join(self.SAVE_PATH, MODEL_NAME)
+        print(f"Saving the model to {path}...")
         torch.save(self.backbone.state_dict(), path)
     
     def load(self, path):

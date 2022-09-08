@@ -3,6 +3,7 @@ import torch
 from torch.utils.data import DataLoader
 import pandas as pd
 from tqdm import tqdm
+import argparse
 
 import config
 from dataset import MNISTDataset
@@ -24,6 +25,14 @@ MODEL_NAME = config.MODEL_NAME
 TEST_DATASET = config.TEST_DATASET
 PREDS_PATH = config.PREDS_PATH
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+"""Argument parsing (can replace arguments from config.py)"""
+parser = argparse.ArgumentParser(description="MNIST model arguments")
+parser.add_argument('--PREDS_PATH', type=str, default=PREDS_PATH, help='path to save the predictions')
+parser.add_argument('--MODEL_NAME', type=str, default=MODEL_NAME, help='model name')
+args = parser.parse_args()
+PREDS_PATH = args.PREDS_PATH
+MODEL_NAME = args.MODEL_NAME
 
 """Load the data set"""
 test_path = os.path.join(DATA_PATH, "test.csv")
