@@ -8,10 +8,10 @@ SAVE_PATH = "saved_models/"
 MODEL_NAME = "model.pt"
 
 """Ensemble training parameters"""
-N_MODELS = 3            # number of models in the ensemble
+N_MODELS = 11            # number of models in the ensemble
 
 """Train parameters"""
-N_EPOCHS = 1
+N_EPOCHS = 30
 BATCH_SIZE = 1024
 LR = 0.001
 SCHEDULER_STEP = 5

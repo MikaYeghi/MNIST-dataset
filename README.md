@@ -31,3 +31,11 @@ python inference.py
 ```
 
 with the ``TEST_DATASET`` variable in ``config.py`` set to ``True``. In this case the model will not try to load any ground-truth labels, and instead it will save the prediction to ``predictions/submission.csv`` with 2 columns: ImageId and Label. This corresponds to the submission format required by the [Kaggle competition](https://www.kaggle.com/competitions/digit-recognizer/overview).
+
+You can also run 
+
+```
+python ensemble_inference.py
+```
+
+to make ensemble predictions on the test data set. In this case, it managed to increase the test accuracy from >98% to >99%.
