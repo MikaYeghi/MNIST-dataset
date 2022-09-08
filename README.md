@@ -1,5 +1,7 @@
 This repository represents a model that is capable of predicting digits in the [MNIST](https://www.kaggle.com/competitions/digit-recognizer/data) data set with a very high accuracy on the test set (>98%). It uses [EfficientNet](https://arxiv.org/abs/1905.11946) as the backbone for image classification.
 
+!!!Before running any script, change the absolute path of the ``ROOT_PATH`` variable in ``config.py`` to the root path of the local copy of this repository on your machine!!!
+
 In order to run the full pipeline, first download the data set by running:
 
 ```
