@@ -1,6 +1,8 @@
 import torch
 from torch import optim
 from matplotlib import pyplot as plt
+from torch.utils.tensorboard import SummaryWriter
+import pathlib
 
 def create_loss_fn():
     return torch.nn.CrossEntropyLoss()
@@ -64,4 +66,27 @@ def plot_training_info(train_losses, val_losses, LRs):
     plt.xlabel("Iteration number")
     plt.ylabel("Cross Entropy Loss")
     plt.title("Validation loss")
+    plt.show()
+
+def get_activation(name, activation):
+    def hook(model, input, output):
+        activation[name] = output.detach()
+    return hook
+
+def plot_layer(activation, layer_split=4):
+    """
+    This function plots the output of the given layer (defined in the main code). Note that it expects the size of the output of the layer
+    to be divisible by layer_split.
+    """
+    act = activation['conv'][0]
+    fig, axarr = plt.subplots(layer_split, int(act.shape[0] / layer_split))
+    if act.shape[0] % layer_split != 0:
+        print(f"The plotting function expected the number of " \
+                f"filters to be divisible by {layer_split}, but it is not possible with " \
+                f"{act.shape[0]} filters.")
+    k = 0
+    for row in range(layer_split):
+        for col in range(int(act.shape[0] / layer_split)):
+            axarr[row][col].imshow(act[k].cpu().numpy(), cmap='gray')
+            k += 1
     plt.show()

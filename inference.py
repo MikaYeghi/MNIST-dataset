@@ -8,9 +8,10 @@ import argparse
 import config
 from dataset import MNISTDataset
 from model import MNISTEfficientNet
-from utils import evaluate, preprocess_batch, OH_encode
+from utils import evaluate, preprocess_batch, plot_layer, get_activation
 
 import pdb
+from matplotlib import pyplot as plt
 
 """CONFIG"""
 ROOT_PATH = config.ROOT_PATH
@@ -24,6 +25,7 @@ SAVE_PATH = config.SAVE_PATH
 MODEL_NAME = config.MODEL_NAME
 TEST_DATASET = config.TEST_DATASET
 PREDS_PATH = config.PREDS_PATH
+PLOT_FILTERS = config.PLOT_FILTERS
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 """Argument parsing (can replace arguments from config.py)"""
@@ -50,6 +52,11 @@ model.load(model_path)
 total_correct = 0
 total = len(test_data)
 
+"""Set up layer visualization"""
+if PLOT_FILTERS:
+    activation = {}
+    custom_handle = model.backbone.layers[0][0].proj.register_forward_hook(get_activation('conv', activation))
+
 """Run inference"""
 if TEST_DATASET:    # data set without known labels
     pred_labels = torch.empty((0)).long().to(device)
@@ -58,8 +65,13 @@ if TEST_DATASET:    # data set without known labels
         images_batch = preprocess_batch(images_batch)
 
         preds = evaluate(model, images_batch)
+        
+        if PLOT_FILTERS:
+            plot_layer(activation)
+
         pred_labels_ = torch.argmax(preds, dim=1).long()
         pred_labels = torch.cat((pred_labels, pred_labels_))
+    
     # Convert pred_labels to a Pandas Dataframe
     pred_labels = pd.DataFrame(pred_labels.cpu().numpy(), columns=['Label'])
     pred_labels.index.names = ['ImageId']

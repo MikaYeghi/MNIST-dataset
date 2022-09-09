@@ -38,6 +38,11 @@ class MNISTEfficientNet(nn.Module):
             print(f"Model {path} loaded successfully.")
         except Exception as e:
             print(e)
+            print("Using randomly initialized model.")
     
     def make_softmax(self):
         return torch.nn.Softmax()
+    
+    def print_params_info(self):
+        for name, param in self.named_parameters():
+            print(f"Parameter name: {name}, requires_grad: {param.requires_grad}")

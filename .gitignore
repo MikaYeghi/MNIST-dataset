@@ -3,3 +3,4 @@ raw_data/
 __pycache__/
 saved_models/
 predictions/
+tensorboard_logs/
