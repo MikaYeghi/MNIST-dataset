@@ -8,11 +8,11 @@ SAVE_PATH = "saved_models/"                                             # path w
 MODEL_NAME = "model.pt"                                                 # model is saved with this name and loaded from this name is LOAD_MODEL=True
 
 """Ensemble training parameters"""
-N_MODELS = 11                                                           # number of models in the ensemble. Preferable to use an odd number greater than 10
+N_MODELS = 21                                                           # number of models in the ensemble. Preferable to use an odd number greater than 10
 
 """Train parameters"""
-N_EPOCHS = 30                                                           # total number of epochs for training
-BATCH_SIZE = 1024                                                       # batch size -- both for training and inference
+N_EPOCHS = 20                                                           # total number of epochs for training
+BATCH_SIZE = 2048                                                       # batch size -- both for training and inference
 LR = 0.001                                                              # initial learning rate
 SCHEDULER_STEP = 5                                                      # frequency of epochs after which the LR is reduced
 SCHEDULER_GAMMA = 0.5                                                   # LR reduction each SCHEDULER_STEP epochs

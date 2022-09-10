@@ -16,17 +16,12 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 """Generate N models"""
 model_names = [f"model_{i + 1}.pt" for i in range(N_MODELS)]
-# models = list()
 k = 0
 print("Starting ensemble training...")
 for model_name in model_names:
     # Model training
     os.system(f"python train.py --MODEL_NAME={model_name}")
-    # model = MNISTEfficientNet(device=device, SAVE_PATH=SAVE_PATH)
     model_path = os.path.join(ROOT_PATH, SAVE_PATH, model_name)
-    # model.load(model_path)
-    # model.to('cpu')     # move to CPU to save GPU memory
-    # models.append(model)
 
     # Inference
     PREDS_PATH = os.path.join(ROOT_PATH, f"predictions/{model_name.split('.')[0]}.csv")
